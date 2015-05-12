@@ -5,7 +5,6 @@ package scjp.chapter1.access_modifiers;
  * Access Modifiers:
  * ................
  * 
- * 
  * 1. There are three access modifiers: public , protected , and private .
  * 2. There are four access levels: public, protected, default, and private.
  * 3. Classes can have only public or default access.
