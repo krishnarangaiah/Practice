@@ -13,10 +13,13 @@
 
 package concepts.serialization;
 
+import java.io.Externalizable;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
@@ -27,26 +30,47 @@ public class SerializationTest {
 
 	public static void main(String[] args) throws CloneNotSupportedException, IOException, ClassNotFoundException {
 
+		/*
+		 * Serialization Process
+		 */
+
 		Person person = new Person("Krishna", "Bangalore", 29, "9986736810");
-		System.out.println(person);
-		Person person2 = person.getClone();
-		System.out.println(person2);
-		System.out.println("Hashcodes: p1: " + person.hashCode() + " | p2: " + person2.hashCode());
 
 		FileOutputStream fos = new FileOutputStream("person.ser");
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(person);
+		oos.close();
 		fos.close();
 
 		FileInputStream fis = new FileInputStream("person.ser");
 		ObjectInputStream ois = new ObjectInputStream(fis);
 		Object obj = ois.readObject();
 		ois.close();
-
-		System.out.println("------------------------------------------------------------");
+		fis.close();
 
 		System.out.println(obj);
 
+		System.out.println("------------------------------------------------------------");
+
+		/*
+		 * Externalization Process
+		 */
+
+		Person2 person2 = new Person2("Srinath", "Hyderabad", 25, "9742061108");
+
+		fos = new FileOutputStream("person2.ser");
+		oos = new ObjectOutputStream(fos);
+		oos.writeObject(person2);
+		oos.close();
+		fos.close();
+
+		fis = new FileInputStream("person2.ser");
+		ois = new ObjectInputStream(fis);
+		obj = ois.readObject();
+		ois.close();
+		fis.close();
+
+		System.out.println(obj);
 
 	}
 
@@ -97,6 +121,77 @@ class Person implements Serializable, Cloneable {
 
 	public Person getClone() throws CloneNotSupportedException {
 		return (Person) super.clone();
+	}
+
+}
+
+/**
+ * The Object to be Externalize
+ * 
+ * @author krishna
+ *
+ */
+class Person2 implements Externalizable {
+
+	private static final long serialVersionUID = 1L;
+	private transient static final Gson GSON = new Gson();
+	private String name;
+	private String address;
+	private int age;
+	private transient String socialSecurityNumber;
+
+
+	public Person2() {
+
+	}
+
+	public Person2(String name, String address, int age, String socialSecurityNumber) {
+		this.name = name;
+		this.address = address;
+		this.age = age;
+		this.socialSecurityNumber = socialSecurityNumber;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public String getSocialSecurityNumber() {
+		return socialSecurityNumber;
+	}
+
+	@Override
+	public String toString() {
+		return GSON.toJson(this);
+	}
+
+	public Person2 getClone() throws CloneNotSupportedException {
+		return (Person2) super.clone();
+	}
+
+
+	public void writeExternal(ObjectOutput out) throws IOException {
+
+		out.writeObject(name);
+		out.writeObject(address);
+		out.writeInt(age);
+
+	}
+
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+
+		name = (String) in.readObject();
+		address = (String) in.readObject();
+		age = in.readInt();
+
 	}
 
 }
